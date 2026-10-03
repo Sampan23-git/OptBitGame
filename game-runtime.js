@@ -91,6 +91,7 @@
   }
 
   buildLayoutButtons(selectedLaneCount);
+  showLaneModePicker();
 
   // Notes use compositor-friendly CSS transform animations. The JS loop only
   // schedules notes and handles hit/miss logic; it never rewrites note position
@@ -520,7 +521,8 @@
         syncKeyMapForLaneCount(laneCount);
         buildLayoutButtons(laneCount);
         panel.remove();
-        startRound();
+        message.textContent = `Режим ${laneCount} кнопок готовий. Натисніть "Почати гру".`;
+        message.style.color = '#d64c9b';
       });
     });
   }
@@ -596,7 +598,9 @@
   }
 
   startButton.addEventListener('click', () => {
-    showLaneModePicker();
+    const pickerVisible = !!document.getElementById('laneModePicker');
+    if (pickerVisible) return;
+    startRound();
   });
   stopButton.addEventListener('click', () => endRound('stopped'));
   volumeControl.addEventListener('input', () => { bgAudio.volume = Number(volumeControl.value); });
