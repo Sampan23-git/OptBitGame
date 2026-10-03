@@ -75,7 +75,7 @@ body::before {
     position: fixed;
     top: 18px;
     right: 18px;
-    z-index: 40;
+    z-index: 80;
     display: inline-block;
     padding: 12px 18px;
     border: 1px solid rgba(255, 255, 255, 0.4);
@@ -385,6 +385,11 @@ body::before {
         0 0 30px rgba(180, 80, 255, 0.8);
 }
 
+.best-score {
+    color: #ffd86b;
+    text-shadow: 0 0 10px rgba(255, 216, 107, 0.75);
+}
+
 .stats {
     display: flex;
 
@@ -413,8 +418,11 @@ body::before {
     text-align: center;
 
     margin-top: 12px;
+    margin-bottom: 8px;
 
-    height: 25px;
+    min-height: 25px;
+    max-width: 100%;
+    line-height: 1.35;
 
     font-size: 18px;
 
@@ -424,11 +432,13 @@ body::before {
 
     text-shadow:
         0 0 8px rgba(255, 80, 190, 0.7);
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 .lane-mode-picker {
     position: fixed;
     inset: 0;
-    z-index: 200;
+    z-index: 60;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -538,7 +548,7 @@ body::before {
 .stop-button:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(220, 80, 80, 0.6); }
 .stop-button:active { transform: translateY(-6px) scale(0.96); }
 
-.control-buttons { display:flex; gap:12px; justify-content:center; align-items:center; flex-wrap:wrap; }
+.control-buttons { display:flex; gap:12px; justify-content:center; align-items:center; flex-wrap:wrap; margin-top: 4px; }
 
 .volume-panel {
     display: flex;
@@ -623,6 +633,32 @@ body::before {
     box-shadow: 0 0 10px rgba(120,60,180,0.25);
 }
 .lane-button:active { transform: scale(0.96); }
+
+.lane-button.hit-glow,
+.arrow-button.hit-glow {
+    background: linear-gradient(135deg,#0d2f20,#0f7f52);
+    border-color: rgba(169, 255, 208, 0.9);
+    box-shadow:
+        0 0 0 2px rgba(220,255,235,0.9),
+        0 0 12px rgba(120, 255, 190, 1),
+        0 0 28px rgba(60, 255, 150, 1),
+        0 0 50px rgba(10, 220, 120, 1),
+        inset 0 0 14px rgba(120,255,190,0.45);
+    transform: translateY(-3px) scale(1.04);
+}
+
+.lane-button.miss-glow,
+.arrow-button.miss-glow {
+    background: linear-gradient(135deg,#3a0e1b,#8f1238);
+    border-color: rgba(255, 196, 209, 0.9);
+    box-shadow:
+        0 0 0 2px rgba(255,230,235,0.95),
+        0 0 14px rgba(255, 100, 140, 1),
+        0 0 30px rgba(255, 40, 90, 1),
+        0 0 54px rgba(255, 10, 70, 1),
+        inset 0 0 16px rgba(255,120,160,0.4);
+    transform: translateY(-3px) scale(1.04);
+}
 
 .lane-button.active {
     transform: scale(0.96);

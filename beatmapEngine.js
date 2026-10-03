@@ -137,7 +137,13 @@
       const roll = rng();
 
       let targetSize = 2;
-      if (tempoPressure > 0.9 && intensity > 0.7 && roll < 0.18) {
+      if (opts.laneCount === 4) {
+        if ((tempoPressure > 0.55 || intensity > 0.7) && roll < 0.7) {
+          targetSize = 4;
+        } else {
+          targetSize = 2;
+        }
+      } else if (tempoPressure > 0.9 && intensity > 0.7 && roll < 0.18) {
         targetSize = 4;
       } else if ((tempoPressure > 0.55 && intensity > 0.62 && roll < 0.45) || (tempoPressure > 1.0 && roll < 0.72)) {
         targetSize = 3;
@@ -197,14 +203,16 @@
 
     notes.sort((a, b) => a.time - b.time);
 
-    // Finale flourish: the very last note becomes a full chord across all lanes.
+    // Finale flourish: on 4-lane charts this becomes a full 4-note hit, while
+    // 6-lane charts still keep their richer chord variety.
     if (notes.length) {
       const lastNote = notes[notes.length - 1];
       if (!lastNote.groupId) {
         const groupId = 'finale';
         lastNote.groupId = groupId;
-        for (let lane = 0; lane < opts.laneCount; lane++) {
-          if (lane === lastNote.lane) continue;
+        const extraLanes = Array.from({ length: opts.laneCount }, (_, lane) => lane)
+          .filter((lane) => lane !== lastNote.lane);
+        for (const lane of extraLanes) {
           notes.push({ time: lastNote.time, lane, source: 'finale', hit: false, missed: false, groupId });
         }
       }

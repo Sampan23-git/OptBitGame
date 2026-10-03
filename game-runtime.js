@@ -24,23 +24,39 @@
   const screenEl = document.querySelector('.screen');
   const laneControlsEl = document.querySelector('.lane-controls');
   let selectedLaneCount = Number(config.laneCount) || 4;
+  let selectedControlScheme = 'arrows';
 
   const laneLayouts = {
     4: {
-      glyphs: ['←', '↓', '↑', '→'],
-      keys: { ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3, KeyA: 0, KeyS: 1, KeyW: 2, KeyD: 3 }
+      arrows: {
+        glyphs: ['←', '↓', '↑', '→'],
+        keys: { ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3, KeyA: 0, KeyS: 1, KeyW: 2, KeyD: 3 }
+      },
+      wasd: {
+        glyphs: ['W', 'A', 'S', 'D'],
+        keys: { KeyW: 0, KeyA: 1, KeyS: 2, KeyD: 3, ArrowUp: 0, ArrowLeft: 1, ArrowDown: 2, ArrowRight: 3 }
+      }
     },
     6: {
-      glyphs: ['A', 'S', 'D', 'J', 'K', 'L'],
-      keys: { KeyA: 0, KeyS: 1, KeyD: 2, KeyJ: 3, KeyK: 4, KeyL: 5 }
+      qwedfd: {
+        glyphs: ['Q', 'W', 'E', 'R', 'D', 'F'],
+        keys: { KeyQ: 0, KeyW: 1, KeyE: 2, KeyR: 3, KeyD: 4, KeyF: 5 }
+      },
+      asdjkkl: {
+        glyphs: ['A', 'S', 'D', 'J', 'K', 'L'],
+        keys: { KeyA: 0, KeyS: 1, KeyD: 2, KeyJ: 3, KeyK: 4, KeyL: 5 }
+      }
     }
   };
 
-  function buildLayoutButtons(targetLaneCount) {
+  function buildLayoutButtons(targetLaneCount, controlScheme = selectedControlScheme) {
     const lanesEl = document.querySelector('.lanes');
     const controlsEl = document.querySelector('.lane-controls');
     const buttonsEl = document.querySelector('.buttons');
-    const glyphs = laneLayouts[targetLaneCount] ? laneLayouts[targetLaneCount].glyphs : laneLayouts[4].glyphs;
+    const layout = targetLaneCount === 4
+      ? (laneLayouts[4][controlScheme] || laneLayouts[4].arrows)
+      : (laneLayouts[6][controlScheme] || laneLayouts[6].asdjkkl);
+    const glyphs = layout ? layout.glyphs : laneLayouts[4].arrows.glyphs;
 
     if (lanesEl) {
       lanesEl.innerHTML = '';
@@ -90,7 +106,7 @@
     recomputeLaneButtonRects();
   }
 
-  buildLayoutButtons(selectedLaneCount);
+  buildLayoutButtons(selectedLaneCount, selectedControlScheme);
   showLaneModePicker();
 
   // Notes use compositor-friendly CSS transform animations. The JS loop only
@@ -99,6 +115,7 @@
   // browsers where main-thread requestAnimationFrame can be less consistent.
   const comboText = document.getElementById('combo');
   const scoreText = document.getElementById('score');
+  const bestScoreText = document.getElementById('bestScore');
   const missesText = document.getElementById('misses');
   const accuracyText = document.getElementById('accuracy');
   const timeLeftText = document.getElementById('timeLeft');
@@ -118,10 +135,12 @@
   let arrowGlyphs = laneLayouts[4].glyphs;
   const spawnY = -60;
 
-  function syncKeyMapForLaneCount(laneCount) {
-    const layout = laneLayouts[laneCount] || laneLayouts[4];
-    physicalKeyMap = { ...layout.keys };
-    arrowGlyphs = [...layout.glyphs];
+  function syncKeyMapForLaneCount(laneCount, controlScheme = selectedControlScheme) {
+    const layout = laneCount === 4
+      ? (laneLayouts[4][controlScheme] || laneLayouts[4].arrows)
+      : (laneLayouts[6][controlScheme] || laneLayouts[6].asdjkkl);
+    physicalKeyMap = { ...(layout ? layout.keys : laneLayouts[4].arrows.keys) };
+    arrowGlyphs = [...(layout ? layout.glyphs : laneLayouts[4].arrows.glyphs)];
   }
 
   let beatmap = null;
@@ -131,6 +150,15 @@
   let activeGroups = [];   // chord groups still in play
 
   let combo = 0, score = 0, misses = 0, hits = 0, totalNotes = 0;
+  let bestScore = 0;
+  try {
+    const storedBest = Number(localStorage.getItem('rhythmGameBestScore') || 0);
+    if (Number.isFinite(storedBest) && storedBest >= 0) {
+      bestScore = storedBest;
+    }
+  } catch (e) {
+    bestScore = 0;
+  }
   let playing = false;
   let roundDurationMs = roundDurationMsFallback;
   let roundTimeout = null;
@@ -234,7 +262,6 @@
     note.el = el;
     note._removed = false;
     spawned.push(note);
-    totalNotes++;
 
     if (note.groupId) {
       let group = activeGroups.find((g) => g.id === note.groupId);
@@ -303,13 +330,37 @@
     time: null
   };
 
+  function syncBestScoreUI() {
+    if (bestScoreText) {
+      setTextIfChanged(bestScoreText, formatScore(bestScore), rendered, 'bestScore');
+    }
+  }
+
+  function updateBestScoreIfNeeded(currentScore) {
+    if (!Number.isFinite(currentScore)) return;
+    if (currentScore <= bestScore) return;
+    bestScore = currentScore;
+    try { localStorage.setItem('rhythmGameBestScore', String(bestScore)); } catch (e) {}
+    syncBestScoreUI();
+  }
+
+  function resolveNoteOutcome(note, wasHit) {
+    if (!note || note.resolved) return;
+    note.resolved = true;
+    totalNotes++;
+    if (wasHit) hits++;
+  }
+
   function renderStatsUI() {
     setTextIfChanged(comboText, combo, rendered, 'combo');
     setTextIfChanged(scoreText, formatScore(score), rendered, 'score');
+    updateBestScoreIfNeeded(score);
     setTextIfChanged(missesText, misses, rendered, 'misses');
     const accuracy = (totalNotes === 0 ? 100 : Math.round((hits / totalNotes) * 100)) + '%';
     setTextIfChanged(accuracyText, accuracy, rendered, 'accuracy');
   }
+
+  syncBestScoreUI();
 
   function renderTimerUI(remainingMs) {
     setTextIfChanged(timeLeftText, formatTime(remainingMs), rendered, 'time');
@@ -354,6 +405,7 @@
   function registerMiss(note) {
     if (note.missed || note.hit) return;
     note.missed = true;
+    resolveNoteOutcome(note, false);
     misses++; combo = 0;
     message.textContent = 'MISS!'; message.style.color = '#ff6b6b';
     removeNote(note, 'disabled');
@@ -371,18 +423,27 @@
     if (misses >= missesLimit) endRound('too many misses');
   }
 
-  function flashButton(laneIndex) {
+  function flashButton(laneIndex, tone = 'hit') {
     try {
-      if (buttons[laneIndex]) { buttons[laneIndex].classList.add('active'); setTimeout(() => buttons[laneIndex].classList.remove('active'), 100); }
-      const lb = laneButtons[laneIndex];
-      if (lb) { lb.classList.add('active'); setTimeout(() => lb.classList.remove('active'), 100); }
+      const activeBtn = buttons[laneIndex];
+      const laneBtn = laneButtons[laneIndex];
+      if (activeBtn) {
+        activeBtn.classList.remove('hit-glow', 'miss-glow');
+        activeBtn.classList.add(tone === 'miss' ? 'miss-glow' : 'hit-glow');
+        setTimeout(() => activeBtn.classList.remove('hit-glow', 'miss-glow'), 140);
+      }
+      if (laneBtn) {
+        laneBtn.classList.remove('hit-glow', 'miss-glow');
+        laneBtn.classList.add(tone === 'miss' ? 'miss-glow' : 'hit-glow');
+        setTimeout(() => laneBtn.classList.remove('hit-glow', 'miss-glow'), 140);
+      }
     } catch (e) {}
   }
 
   function triggerHit(laneIndex) {
     if (!playing) return;
     if (laneButtons[laneIndex] && laneButtons[laneIndex].disabled) return;
-    flashButton(laneIndex);
+    flashButton(laneIndex, 'hit');
 
     const currentTime = bgAudio.currentTime || 0;
     let best = null, bestDiff = Infinity;
@@ -395,6 +456,7 @@
     if (!best || bestDiff > hitWindowSec) {
       misses++; combo = 0;
       const early = best && best.time > currentTime;
+      flashButton(laneIndex, 'miss');
       message.textContent = early ? 'EARLY' : 'MISS!';
       message.style.color = early ? '#ffd86b' : '#ff6b6b';
       spawnFlyingNote(laneIndex, 'miss');
@@ -404,11 +466,11 @@
     }
 
     best.hit = true;
+    resolveNoteOutcome(best, true);
 
     if (best.groupId) {
       const group = activeGroups.find((g) => g.id === best.groupId);
       if (group) {
-        hits++; // still counts toward accuracy, even though score comes from the group bonus
         group.hitLanes.add(laneIndex);
         spawnFlyingNote(laneIndex, 'group');
         removeNote(best, null);
@@ -418,7 +480,7 @@
       }
     }
 
-    hits++; combo++;
+    combo++;
     const accuracyFactor = clamp01(1 - bestDiff / hitWindowSec);
     score += Math.round(100 * (0.5 + accuracyFactor * 0.5));
     message.textContent = 'GOOD!'; message.style.color = '#7cffb2';
@@ -500,11 +562,19 @@
       <div class="lane-mode-card">
         <h3>Вибери режим раунду</h3>
         <div class="lane-mode-options">
-          <button type="button" class="lane-mode-btn" data-lane-count="4">
+          <button type="button" class="lane-mode-btn" data-lane-count="4" data-control-scheme="arrows">
             <span>4 кнопки</span>
-            <small>← ↓ ↑ →</small>
+            <small>стрілочки: ← ↓ ↑ →</small>
           </button>
-          <button type="button" class="lane-mode-btn" data-lane-count="6">
+          <button type="button" class="lane-mode-btn" data-lane-count="4" data-control-scheme="wasd">
+            <span>4 кнопки</span>
+            <small>W A S D</small>
+          </button>
+          <button type="button" class="lane-mode-btn" data-lane-count="6" data-control-scheme="qwedfd">
+            <span>6 кнопок</span>
+            <small>Q W E R D F</small>
+          </button>
+          <button type="button" class="lane-mode-btn" data-lane-count="6" data-control-scheme="asdjkkl">
             <span>6 кнопок</span>
             <small>A S D J K L</small>
           </button>
@@ -517,11 +587,16 @@
     panel.querySelectorAll('.lane-mode-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         const laneCount = Number(btn.dataset.laneCount) || 4;
+        const controlScheme = btn.dataset.controlScheme || (laneCount === 4 ? 'arrows' : 'asdjkkl');
         selectedLaneCount = laneCount;
-        syncKeyMapForLaneCount(laneCount);
-        buildLayoutButtons(laneCount);
+        selectedControlScheme = controlScheme;
+        syncKeyMapForLaneCount(laneCount, selectedControlScheme);
+        buildLayoutButtons(laneCount, selectedControlScheme);
         panel.remove();
-        message.textContent = `Режим ${laneCount} кнопок готовий. Натисніть "Почати гру".`;
+        const label = laneCount === 4
+          ? (controlScheme === 'wasd' ? 'W A S D' : 'стрілочки ← ↓ ↑ →')
+          : (controlScheme === 'qwedfd' ? 'Q W E R D F' : 'A S D J K L');
+        message.textContent = `Режим ${laneCount} кнопок (${label}) готовий. Натисніть "Почати гру".`;
         message.style.color = '#d64c9b';
       });
     });
@@ -534,7 +609,7 @@
       ? bgAudio.duration
       : roundDurationMsFallback / 1000;
     roundDurationMs = durationSec * 1000;
-    syncKeyMapForLaneCount(selectedLaneCount);
+    syncKeyMapForLaneCount(selectedLaneCount, selectedControlScheme);
 
     chart = beatmap ? engine.buildChart(beatmap, { laneCount: selectedLaneCount }) : buildFallbackChart(durationSec, selectedLaneCount);
     chart.forEach(scheduleNote);
@@ -588,10 +663,11 @@
     message.textContent = `${reasonText}Підсумок: ${scoreText.textContent} очок. Натисніть "Почати гру" щоб зіграти ще.`;
     startButton.textContent = 'Грати ще раз';
 
+    updateBestScoreIfNeeded(score);
     if (reason === 'time') {
       try {
         endModalTitle.textContent = 'Вітаємо!';
-        endModalMsg.textContent = `Раунд завершено. Ваш рахунок: ${scoreText.textContent} очок.`;
+        endModalMsg.textContent = `Раунд завершено. Ваш рахунок: ${scoreText.textContent} очок. Найкращий: ${formatScore(bestScore)}.`;
         endModal.classList.add('visible'); endModal.setAttribute('aria-hidden', 'false');
       } catch (e) {}
     }
