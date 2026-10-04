@@ -497,6 +497,13 @@
   laneButtons.forEach((btn) => { const i = Number(btn.dataset.lane); btn.addEventListener('click', () => triggerHit(i)); });
   document.addEventListener('keydown', (e) => {
     if (e.repeat) return; // held key -> browser auto-repeats keydown; ignore, don't count as extra misses
+
+    if (e.code === 'Space' && !playing) {
+      e.preventDefault();
+      startRound();
+      return;
+    }
+
     const idx = physicalKeyMap[e.code];
     if (idx !== undefined) { e.preventDefault(); triggerHit(idx); }
   }, { passive: false });
