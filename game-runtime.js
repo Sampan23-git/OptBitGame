@@ -33,8 +33,12 @@
         keys: { ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3, KeyA: 0, KeyS: 1, KeyW: 2, KeyD: 3 }
       },
       wasd: {
-        glyphs: ['W', 'A', 'S', 'D'],
-        keys: { KeyW: 0, KeyA: 1, KeyS: 2, KeyD: 3, ArrowUp: 0, ArrowLeft: 1, ArrowDown: 2, ArrowRight: 3 }
+        glyphs: ['A', 'S', 'W', 'D'],
+        keys: { KeyA: 0, KeyS: 1, KeyW: 2, KeyD: 3, ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3 }
+      },
+      fghj: {
+        glyphs: ['F', 'G', 'H', 'J'],
+        keys: { KeyF: 0, KeyG: 1, KeyH: 2, KeyJ: 3 }
       }
     },
     6: {
@@ -568,7 +572,11 @@
           </button>
           <button type="button" class="lane-mode-btn" data-lane-count="4" data-control-scheme="wasd">
             <span>4 кнопки</span>
-            <small>W A S D</small>
+            <small>A S W D</small>
+          </button>
+          <button type="button" class="lane-mode-btn" data-lane-count="4" data-control-scheme="fghj">
+            <span>4 кнопки</span>
+            <small>F G H J</small>
           </button>
           <button type="button" class="lane-mode-btn" data-lane-count="6" data-control-scheme="qwedfd">
             <span>6 кнопок</span>
@@ -594,7 +602,7 @@
         buildLayoutButtons(laneCount, selectedControlScheme);
         panel.remove();
         const label = laneCount === 4
-          ? (controlScheme === 'wasd' ? 'W A S D' : 'стрілочки ← ↓ ↑ →')
+          ? (controlScheme === 'wasd' ? 'A S W D' : controlScheme === 'fghj' ? 'F G H J' : 'стрілочки ← ↓ ↑ →')
           : (controlScheme === 'qwedfd' ? 'Q W E R D F' : 'A S D J K L');
         message.textContent = `Режим ${laneCount} кнопок (${label}) готовий. Натисніть "Почати гру".`;
         message.style.color = '#d64c9b';
