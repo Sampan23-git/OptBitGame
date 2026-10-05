@@ -123,6 +123,17 @@
       "pagePath": "./chugun.html"
     },
     {
+      "id": "likhtaryky",
+      "title": "Ліхтарики",
+      "audioPath": "./Музика/Тоня Матвієнко — Ліхтарики Official Video - Тоня Матвієнко(1).mp3",
+      "beatmapPath": "./Біти/Likhtaryky.json",
+      "durationSec": 150.05,
+      "bpm": 113.0,
+      "numBeats": 72,
+      "difficulty": "Normal",
+      "pagePath": "./likhtaryky.html"
+    },
+    {
       "id": "smaragd",
       "title": "Смарагдове небо",
       "audioPath": "./Музика/smaragd.mp3",
