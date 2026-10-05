@@ -49,11 +49,11 @@
       "id": "rip-city",
       "title": "Lil Texas - Rip City",
       "audioPath": "./Музика/Lil Texas - Rip City.mp3",
-      "beatmapPath": "./БІти/Lil_Texas_-_Rip_City.json",
+      "beatmapPath": "./Біти/Lil_Texas_Rip_City_BEAT_FIXED_WITH_TEMPO_CHANGES.json",
       "durationSec": 161.36,
       "bpm": 92.3,
       "numBeats": 60,
-      "difficulty": "Easy",
+      "difficulty": "Hard",
       "pagePath": "./ripcity.html"
     },
     {
@@ -75,8 +75,8 @@
       "durationSec": 125.91,
       "bpm": 99.4,
       "numBeats": 52,
-      "difficulty": "Easy",
-      "pagePath": "./barabere.html"
+      "difficulty": "Hard",
+      "pagePath": "./gubka.html"
     },
     {
       "id": "hear-this",
@@ -86,7 +86,7 @@
       "durationSec": 158.27,
       "bpm": 92.3,
       "numBeats": 52,
-      "difficulty": "Easy",
+      "difficulty": "Hard",
       "pagePath": "./hearthis.html"
     },
     {
@@ -119,7 +119,7 @@
       "durationSec": 214.05,
       "bpm": 95.7,
       "numBeats": 61,
-      "difficulty": "Easy",
+      "difficulty": "Hard",
       "pagePath": "./chugun.html"
     },
     {
@@ -141,7 +141,7 @@
       "durationSec": 186.83,
       "bpm": 117.5,
       "numBeats": 60,
-      "difficulty": "Normal",
+      "difficulty": "Easy",
       "pagePath": "./Smaragd.html"
     },
     {

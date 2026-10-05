@@ -93,6 +93,35 @@
     return clamp((bpm - 90) / 90, 0, 1.5);
   }
 
+  function getTempoAnalysisFactor(beatmap, t) {
+    const analysis = beatmap && beatmap.tempo_analysis;
+    const segments = Array.isArray(analysis && analysis.all_detected_segments)
+      ? analysis.all_detected_segments
+      : Array.isArray(analysis && analysis.acceleration_segments)
+        ? analysis.acceleration_segments.concat(Array.isArray(analysis.deceleration_segments) ? analysis.deceleration_segments : [])
+        : [];
+
+    if (!segments.length) return 1;
+
+    const time = Number(t) || 0;
+    for (const seg of segments) {
+      const start = Number(seg && (seg.start_sec ?? seg.start_time ?? 0));
+      const end = Number(seg && (seg.end_sec ?? seg.end_time ?? start));
+      if (time < start || time > end) continue;
+
+      const span = end - start || 1;
+      const progress = (time - start) / span;
+      const change = Number(seg && (seg.bpm_change_approx ?? seg.change ?? 0)) || 0;
+      const direction = String(seg && seg.type || '').toLowerCase().includes('acc') ? 1 : -1;
+      const magnitude = clamp(Math.abs(change) / 180, 0.04, 0.22);
+      const wave = 0.5 + Math.sin(progress * Math.PI) * 0.5;
+      const adjustment = direction * magnitude * (0.6 + wave * 0.8);
+      return 1 + adjustment;
+    }
+
+    return 1;
+  }
+
   const DEFAULT_CHART_OPTIONS = {
     laneCount: 4,
     minGapSec: 0.16,               // never place two notes closer together than this
@@ -225,11 +254,12 @@
   // tempo and, more importantly, its moment-to-moment intensity - so a chorus
   // or buildup genuinely feels faster/harder than a quiet verse.
   function getFallSpeed(beatmap, t, baseSpeedPxPerSec, options) {
-    const opts = Object.assign({ intensityBoost: 0.6, minFactor: 0.75, maxFactor: 1.9 }, options || {});
-    const bpm = Number(beatmap && beatmap.global_bpm) || 120;
+    const opts = Object.assign({ intensityBoost: 0.35, minFactor: 0.75, maxFactor: 2.15 }, options || {});
+    const bpm = Number(getBpmAt(beatmap, t)) || 120;
     const bpmFactor = clamp(bpm / 120, 0.7, 1.6);
+    const tempoFactor = getTempoAnalysisFactor(beatmap, t);
     const intensity = getIntensityAt(beatmap, t);
-    const factor = clamp(bpmFactor * (1 + intensity * opts.intensityBoost), opts.minFactor, opts.maxFactor);
+    const factor = clamp(bpmFactor * tempoFactor * (1 + intensity * opts.intensityBoost), opts.minFactor, opts.maxFactor);
     return (Number(baseSpeedPxPerSec) || 430) * factor;
   }
 

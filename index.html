@@ -3,55 +3,217 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Dance to the Rhythm</title>
+    <title>Rhythm Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main class="menu-wrapper">
-        <section class="menu-card">
-            <header class="menu-header">
-                <p class="eyebrow">Rhythm Game</p>
-                <h1 class="site-title">Dance to the Rhythm</h1>
-            </header>
-            <div class="game-list" id="gameList">
-            </div>
-        </section>
-    </main>
-        <script>
-            (async () => {
-                try {
-                    const res = await fetch('./assets/songs.config.json');
-                    const cfg = await res.json();
-                    const difficultyOrder = { Easy: 1, Normal: 2, Hard: 3, Expert: 4 };
-                    const songs = [...(cfg.songs || [])].sort((a, b) => {
-                        const diffA = difficultyOrder[a.difficulty] ?? Number.MAX_SAFE_INTEGER;
-                        const diffB = difficultyOrder[b.difficulty] ?? Number.MAX_SAFE_INTEGER;
-                        if (diffA !== diffB) return diffA - diffB;
-                        return (a.title || '').localeCompare(b.title || '');
-                    });
+    <div class="page-shell">
+        <aside class="sidebar" aria-label="Навігація">
+            <button class="nav-btn active" type="button" aria-label="Головна">
+                <span class="nav-icon">⌂</span>
+                <span>Головна</span>
+            </button>
+            <button class="nav-btn" type="button" aria-label="Рекорди">
+                <span class="nav-icon">▣</span>
+                <span>Рекорди</span>
+            </button>
+            <button class="nav-btn" type="button" aria-label="Налаштування">
+                <span class="nav-icon">⚙</span>
+                <span>Налаштування</span>
+            </button>
+            <button class="nav-btn" type="button" aria-label="Вихід">
+                <span class="nav-icon">⎋</span>
+                <span>Вихід</span>
+            </button>
+        </aside>
 
-                    const container = document.getElementById('gameList');
-                    container.innerHTML = '';
-                    songs.forEach(s => {
-                        const art = document.createElement('article');
-                        art.className = 'game-item';
-                        const div = document.createElement('div');
-                        const h2 = document.createElement('h2');
-                        h2.textContent = s.title.replace(/\.mp3$/i, '').replace(/_/g,' ');
-                        div.appendChild(h2);
-                        const a = document.createElement('a');
-                        a.className = 'btn primary';
-                        a.href = s.pagePath || '#';
-                        a.textContent = 'Грати';
-                        const meta = document.createElement('p');
-                        meta.textContent = `BPM: ${s.bpm} · ${Math.round(s.durationSec)}s · ${s.difficulty}`;
-                        art.appendChild(div);
-                        art.appendChild(meta);
-                        art.appendChild(a);
-                        container.appendChild(art);
+        <main class="main-panel">
+            <header class="topbar">
+                <div class="branding" aria-label="Rhythm Game">
+                    <div class="title">RHYTHM GAME</div>
+                    <div class="subtitle">Dance to the Rhythm</div>
+                </div>
+
+                <div class="topbar-tools">
+                    <div class="score-badge" aria-live="polite" aria-label="Кількість очок">
+                        <span class="score-icon">◉</span>
+                        <span class="score-value" id="scoreValue">2 000</span>
+                        <span class="score-unit">очок</span>
+                    </div>
+
+                    <button class="profile-btn" type="button" aria-label="Профіль">◔</button>
+                </div>
+            </header>
+
+            <section class="menu-card" aria-label="Вибір рівня">
+                <div class="difficulty-tabs" role="tablist" aria-label="Складність">
+                    <button class="difficulty-tab active" type="button" role="tab" aria-selected="true" data-filter="all">Всі рівні</button>
+                    <button class="difficulty-tab" type="button" role="tab" aria-selected="false" data-filter="Easy">Легкий</button>
+                    <button class="difficulty-tab" type="button" role="tab" aria-selected="false" data-filter="Normal">Середній</button>
+                    <button class="difficulty-tab" type="button" role="tab" aria-selected="false" data-filter="Hard">Складний</button>
+                </div>
+
+                <div class="game-grid" id="gameList" aria-live="polite"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            const STORAGE_KEY = 'rhythm-game-progress-v1';
+            const difficultyScore = {
+                Easy: 300,
+                Normal: 600,
+                Hard: 900
+            };
+
+            const getProgress = () => {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    const parsed = raw ? JSON.parse(raw) : {};
+                    return {
+                        completed: Array.isArray(parsed.completed) ? parsed.completed : []
+                    };
+                } catch (error) {
+                    console.warn('Failed to read progress', error);
+                    return { completed: [] };
+                }
+            };
+
+            const saveProgress = (completed) => {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({ completed }));
+            };
+
+            const normalizeKey = (value = '') => String(value)
+                .toLowerCase()
+                .replace(/\.[^.]+$/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .replace(/-+/g, '-');
+
+            const calculateScore = (songs, completed) => {
+                const set = new Set((completed || []).map(normalizeKey));
+                return songs.reduce((total, song) => {
+                    const songKey = normalizeKey(song.id || song.title || song.pagePath || '');
+                    return total + (set.has(songKey) ? (difficultyScore[song.difficulty] || 300) : 0);
+                }, 0);
+            };
+
+            const gameState = {
+                score: 2000
+            };
+
+            const scoreValue = document.getElementById('scoreValue');
+            const updateScore = (value) => {
+                gameState.score = value;
+                scoreValue.textContent = new Intl.NumberFormat('uk-UA').format(value);
+            };
+
+            window.rhythmGame = window.rhythmGame || {};
+            window.rhythmGame.score = gameState.score;
+            window.rhythmGame.setScore = function (value) {
+                updateScore(Number(value) || 0);
+                return window.rhythmGame.score;
+            };
+
+            window.rhythmGame.completeSong = function (songId) {
+                const { completed } = getProgress();
+                const next = Array.from(new Set([...completed.map(normalizeKey), normalizeKey(songId)]));
+                saveProgress(next);
+                updateScore(calculateScore(window.rhythmGame.allSongs || [], next));
+                renderCards();
+                return window.rhythmGame.score;
+            };
+
+            window.rhythmGame.openSong = function (songPath) {
+                if (songPath && songPath !== '#') {
+                    window.location.href = songPath;
+                }
+            };
+
+            const difficultyOrder = { Easy: 1, Normal: 2, Hard: 3 };
+            const difficultyMeta = {
+                Easy: { label: 'Легкий', stars: 1 },
+                Normal: { label: 'Середній', stars: 2 },
+                Hard: { label: 'Складний', stars: 3 }
+            };
+
+            const container = document.getElementById('gameList');
+            const tabs = Array.from(document.querySelectorAll('.difficulty-tab'));
+            let activeFilter = 'all';
+
+            const formatSongTitle = (title = '') => title
+                .replace(/\.mp3$/i, '')
+                .replace(/_/g, ' ')
+                .trim();
+
+            const sortSongs = (songs) => {
+                return [...songs].sort((a, b) => {
+                    const diffA = difficultyOrder[a.difficulty] ?? 999;
+                    const diffB = difficultyOrder[b.difficulty] ?? 999;
+                    if (diffA !== diffB) return diffA - diffB;
+                    return (a.title || '').localeCompare(b.title || '');
+                });
+            };
+
+            const renderCards = () => {
+                fetch('./assets/songs.config.json')
+                    .then((res) => res.json())
+                    .then((cfg) => {
+                        const songs = sortSongs(cfg.songs || []);
+                        window.rhythmGame.allSongs = songs;
+                        const { completed } = getProgress();
+                        const completedKeys = new Set(completed.map(normalizeKey));
+                        updateScore(calculateScore(songs, completed));
+
+                        const visibleSongs = activeFilter === 'all'
+                            ? songs
+                            : songs.filter((song) => song.difficulty === activeFilter);
+
+                        container.innerHTML = visibleSongs.map((song, index) => {
+                            const meta = difficultyMeta[song.difficulty] || { label: song.difficulty || 'Рівень', stars: 3 };
+                            const stars = Array.from({ length: 3 }, (_, starIndex) => `<span class="star ${starIndex < meta.stars ? 'active' : ''}">★</span>`).join('');
+                            const title = formatSongTitle(song.title);
+                            const finishedCandidates = [song.id, song.title, song.beatmapPath, song.audioPath, song.pagePath];
+                            const isCompleted = finishedCandidates.some((candidate) => completedKeys.has(normalizeKey(candidate)));
+
+                            return `
+                                <article class="game-card ${isCompleted ? 'completed' : ''}" aria-label="${title}">
+                                    <div class="card-rank">${index + 1}</div>
+                                    ${isCompleted ? '<span class="card-complete-badge" aria-label="Раунд пройдено">✓</span>' : ''}
+                                    <div class="card-content">
+                                        <h2>${title}</h2>
+                                        <p class="difficulty-line">${meta.label}</p>
+                                        <div class="stars" aria-label="Рейтинг ${meta.stars} з 5">${stars}</div>
+                                        <a class="card-btn" href="${song.pagePath || '#'}" aria-label="Грати ${title}">
+                                            ${isCompleted ? 'Пройдено' : 'Грати'}
+                                        </a>
+                                    </div>
+                                </article>
+                            `;
+                        }).join('');
+                    })
+                    .catch((error) => {
+                        console.warn('Failed to load songs.config.json', error);
+                        container.innerHTML = '<div class="empty-state">Не вдалося завантажити раунди.</div>';
                     });
-                } catch (e) { console.warn('Failed to load songs.config.json', e); }
-            })();
-        </script>
-    </body>
+            };
+
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    activeFilter = tab.dataset.filter || 'all';
+                    tabs.forEach((item) => {
+                        const isActive = item === tab;
+                        item.classList.toggle('active', isActive);
+                        item.setAttribute('aria-selected', String(isActive));
+                    });
+                    renderCards();
+                });
+            });
+
+            updateScore(2000);
+            renderCards();
+        })();
+    </script>
+</body>
 </html>

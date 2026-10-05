@@ -8,6 +8,22 @@
   const menuHref = config.menuHref || 'index.html';
   const missesLimit = config.missesLimit || 100;
   const roundDurationMsFallback = config.roundDurationMs || 3 * 60 * 1000;
+  const normalizeId = (value = '') => String(value)
+    .toLowerCase()
+    .replace(/\.[^.]+$/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-');
+  const currentSongId = config.songId || (() => {
+    const rawName = (beatmapPath || location.pathname || '')
+      .split(/[\\/]/)
+      .pop()
+      .replace(/\.[^.]+$/, '')
+      .replace(/[^a-zA-Z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase();
+    return normalizeId(rawName || 'round');
+  })();
 
   // --- Tunable difficulty/feel constants -----------------------------------
   const baseFallSpeed = Number(config.baseFallSpeed) || 430; // px/sec baseline
@@ -660,6 +676,19 @@
     rafId = requestAnimationFrame(gameLoop);
   }
 
+  function persistCompletedRound() {
+    try {
+      const STORAGE_KEY = 'rhythm-game-progress-v1';
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      const completed = Array.isArray(parsed.completed) ? parsed.completed : [];
+      const next = Array.from(new Set([...completed.map((value) => normalizeId(value)), normalizeId(currentSongId)]));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ completed: next }));
+    } catch (e) {
+      console.warn('Failed to save completed round', e);
+    }
+  }
+
   function endRound(reason) {
     if (!playing) return;
     playing = false;
@@ -680,6 +709,7 @@
 
     updateBestScoreIfNeeded(score);
     if (reason === 'time') {
+      persistCompletedRound();
       try {
         endModalTitle.textContent = 'Вітаємо!';
         endModalMsg.textContent = `Раунд завершено. Ваш рахунок: ${scoreText.textContent} очок. Найкращий: ${formatScore(bestScore)}.`;
