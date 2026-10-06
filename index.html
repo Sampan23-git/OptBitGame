@@ -144,19 +144,22 @@
             };
 
             const gameState = {
-                score: 2000
+                score: 0
             };
 
             const scoreValue = document.getElementById('scoreValue');
             const updateScore = (value) => {
-                gameState.score = value;
-                scoreValue.textContent = new Intl.NumberFormat('uk-UA').format(value);
+                const nextValue = Number.isFinite(Number(value)) ? Number(value) : 0;
+                gameState.score = nextValue;
+                window.rhythmGame.score = nextValue;
+                scoreValue.textContent = new Intl.NumberFormat('uk-UA').format(nextValue);
             };
 
             window.rhythmGame = window.rhythmGame || {};
             window.rhythmGame.score = gameState.score;
             window.rhythmGame.setScore = function (value) {
-                updateScore(Number(value) || 0);
+                const nextValue = Number.isFinite(Number(value)) ? Number(value) : 0;
+                updateScore(nextValue);
                 return window.rhythmGame.score;
             };
 
@@ -550,7 +553,7 @@
             }
             applyTheme(initialThemeId);
             setActiveView('home');
-            updateScore(2000);
+            updateScore(0);
             renderCards();
         })();
     </script>
