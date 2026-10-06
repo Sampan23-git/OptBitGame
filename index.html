@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Rhythm Game</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme-variants.css">
+    <link rel="stylesheet" href="game-theme.css">
 </head>
 <body>
     <div class="page-shell">
         <aside class="sidebar" aria-label="Навігація">
-            <button class="nav-btn active" type="button" aria-label="Головна">
+            <button class="nav-btn active" type="button" aria-label="Головна" data-view="home">
                 <span class="nav-icon">⌂</span>
                 <span>Головна</span>
             </button>
-            <button class="nav-btn" type="button" aria-label="Рекорди">
+            <button class="nav-btn" type="button" aria-label="Магазин" data-view="shop">
                 <span class="nav-icon">▣</span>
-                <span>Рекорди</span>
+                <span>Магазин</span>
             </button>
             <button class="nav-btn" type="button" aria-label="Налаштування">
                 <span class="nav-icon">⚙</span>
@@ -46,6 +48,24 @@
             </header>
 
             <section class="menu-card" aria-label="Вибір рівня">
+                <div class="toolbar-row">
+                    <label class="search-field" aria-label="Пошук раунду">
+                        <span class="search-icon" aria-hidden="true">⌕</span>
+                        <input
+                            id="songSearch"
+                            type="search"
+                            placeholder="Пошук раунду..."
+                            aria-label="Пошук раунду по назві"
+                        >
+                        <button
+                            id="searchClearBtn"
+                            class="search-clear-btn hidden"
+                            type="button"
+                            aria-label="Скасувати пошук"
+                        >✕</button>
+                    </label>
+                </div>
+
                 <div class="difficulty-tabs" role="tablist" aria-label="Складність">
                     <button class="difficulty-tab active" type="button" role="tab" aria-selected="true" data-filter="all">Всі рівні</button>
                     <button class="difficulty-tab" type="button" role="tab" aria-selected="false" data-filter="Easy">Легкий</button>
@@ -54,6 +74,17 @@
                 </div>
 
                 <div class="game-grid" id="gameList" aria-live="polite"></div>
+            </section>
+
+            <section class="shop-panel hidden" id="shopPanel" aria-label="Магазин персоналізації">
+                <div class="shop-header">
+                    <div>
+                        <p class="shop-kicker">Магазин</p>
+                        <h2>Персоналізація сайту</h2>
+                    </div>
+                </div>
+
+                <div class="shop-grid" id="shopGrid"></div>
             </section>
         </main>
     </div>
@@ -99,6 +130,19 @@
                 }, 0);
             };
 
+            const spreadCompletionAcrossRounds = (songs = []) => {
+                const next = Array.from(new Set([
+                    ...getProgress().completed,
+                    ...songs
+                        .map((song) => song.id || song.title || song.pagePath || '')
+                        .filter(Boolean)
+                        .map(normalizeKey)
+                ]));
+
+                saveProgress(next);
+                return next;
+            };
+
             const gameState = {
                 score: 2000
             };
@@ -139,8 +183,212 @@
             };
 
             const container = document.getElementById('gameList');
+            const searchInput = document.getElementById('songSearch');
+            const searchClearBtn = document.getElementById('searchClearBtn');
             const tabs = Array.from(document.querySelectorAll('.difficulty-tab'));
+            const navButtons = Array.from(document.querySelectorAll('.nav-btn'));
+            const menuCard = document.querySelector('.menu-card');
+            const shopPanel = document.getElementById('shopPanel');
+            const shopGrid = document.getElementById('shopGrid');
             let activeFilter = 'all';
+            let searchTerm = '';
+
+            const syncSearchClearButton = () => {
+                const hasValue = (searchInput.value || '').trim().length > 0;
+                searchClearBtn.classList.toggle('hidden', !hasValue);
+            };
+
+            const resetSearch = () => {
+                searchTerm = '';
+                searchInput.value = '';
+                syncSearchClearButton();
+                renderCards();
+            };
+
+            const THEME_STORAGE_KEY = 'rhythm-game-theme-v1';
+            const SHOP_STORAGE_KEY = 'rhythm-game-shop-v1';
+            const THEME_PRESETS = {
+                standard: ['#090014', '#140423'],
+                'dark-fantasy': ['#090514', '#171126'],
+                'golden-heat': ['#1b1206', '#2a1d09'],
+                'sunset-glow': ['#180b12', '#2b1220'],
+                'ice-pulse': ['#04131a', '#0e2434'],
+                red: ['#2a0d13', '#53141d'],
+                green: ['#0d1f1a', '#173d2d'],
+                pink: ['#2b0d26', '#4a123a']
+            };
+            const DEFAULT_THEME = {
+                id: 'standard',
+                name: 'Стандартний',
+                cost: 0,
+                description: 'Оригінальний стиль сайту'
+            };
+
+            const SHOP_ITEMS = [
+                DEFAULT_THEME,
+                {
+                    id: 'dark-fantasy',
+                    name: 'Dark Fantasy',
+                    cost: 150,
+                    description: 'Темна фентезійна палітра з глибоким фіолетовим світлом'
+                },
+                {
+                    id: 'golden-heat',
+                    name: 'Golden Heat',
+                    cost: 150,
+                    description: 'Жовтий окрас зі золотистим світлом і теплим контрастом'
+                },
+                {
+                    id: 'sunset-glow',
+                    name: 'Sunset Glow',
+                    cost: 150,
+                    description: 'Теплі відтінки, помаранчевий контраст'
+                },
+                {
+                    id: 'ice-pulse',
+                    name: 'Ice Pulse',
+                    cost: 150,
+                    description: 'Холодні сині тони і чистий стиль'
+                },
+                {
+                    id: 'red',
+                    name: 'Red Rush',
+                    cost: 150,
+                    description: 'Червоні відтінки з енергійним і насиченим контрастом'
+                },
+                {
+                    id: 'green',
+                    name: 'Green Pulse',
+                    cost: 150,
+                    description: 'Зелений стиль з природним і свіжим відчуттям'
+                },
+                {
+                    id: 'pink',
+                    name: 'Pink Pop',
+                    cost: 150,
+                    description: 'Рожева палітра з яскравим і миловидним акцентом'
+                }
+            ];
+
+            const loadThemeState = () => {
+                try {
+                    const raw = localStorage.getItem(THEME_STORAGE_KEY);
+                    return raw ? JSON.parse(raw) : { selected: 'standard' };
+                } catch (error) {
+                    console.warn('Failed to read theme state', error);
+                    return { selected: 'standard' };
+                }
+            };
+
+            const saveThemeState = (state) => {
+                localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(state));
+            };
+
+            const loadShopState = () => {
+                try {
+                    const raw = localStorage.getItem(SHOP_STORAGE_KEY);
+                    if (!raw) {
+                        return { owned: ['standard'] };
+                    }
+                    const parsed = JSON.parse(raw);
+                    return {
+                        owned: Array.isArray(parsed.owned) && parsed.owned.length ? parsed.owned : ['standard']
+                    };
+                } catch (error) {
+                    console.warn('Failed to read shop state', error);
+                    return { owned: ['standard'] };
+                }
+            };
+
+            const saveShopState = (state) => {
+                localStorage.setItem(SHOP_STORAGE_KEY, JSON.stringify(state));
+            };
+
+            const getThemeById = (themeId) => SHOP_ITEMS.find((item) => item.id === themeId) || DEFAULT_THEME;
+
+            const applyTheme = (themeId) => {
+                document.body.dataset.theme = themeId;
+                saveThemeState({ selected: themeId });
+            };
+
+            const renderShop = () => {
+                const shopState = loadShopState();
+                const themeState = loadThemeState();
+                const currentScore = Number(window.rhythmGame?.score ?? 0);
+
+                shopGrid.innerHTML = SHOP_ITEMS.map((item) => {
+                    const isOwned = shopState.owned.includes(item.id);
+                    const isSelected = themeState.selected === item.id;
+                    const isAffordable = currentScore >= item.cost;
+                    const disabled = !isAffordable && !isOwned && item.id !== 'standard';
+                    const gradient = THEME_PRESETS[item.id] || THEME_PRESETS.standard;
+                    const buttonLabel = item.id === 'standard'
+                        ? (isSelected ? 'Стандартний' : 'Вибрати стандарт')
+                        : (isOwned ? (isSelected ? 'Обрано' : 'Встановити') : `Купити за ${item.cost}`);
+
+                    return `
+                        <article class="shop-item ${isSelected ? 'selected' : ''}">
+                            <div class="shop-item-preview" style="background: linear-gradient(135deg, ${gradient[0]}, ${gradient[1]});"></div>
+                            <div class="shop-item-body">
+                                <div class="shop-item-topline">
+                                    <h3>${item.name}</h3>
+                                    <span class="shop-cost">${item.cost === 0 ? 'Стандарт' : `${item.cost} pts`}</span>
+                                </div>
+                                <p>${item.description}</p>
+                                <button
+                                    class="shop-buy-btn ${isOwned ? 'owned' : ''} ${isSelected ? 'selected' : ''}"
+                                    type="button"
+                                    data-theme-id="${item.id}"
+                                    ${disabled ? 'disabled' : ''}
+                                >
+                                    ${buttonLabel}
+                                </button>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+
+                shopGrid.querySelectorAll('.shop-buy-btn').forEach((button) => {
+                    button.addEventListener('click', () => {
+                        const themeId = button.dataset.themeId;
+                        const shopState = loadShopState();
+                        const currentScore = Number(window.rhythmGame?.score ?? 0);
+                        const theme = getThemeById(themeId);
+
+                        if (!theme) {
+                            return;
+                        }
+
+                        if (themeId !== 'standard' && !shopState.owned.includes(themeId)) {
+                            if (currentScore < theme.cost) {
+                                return;
+                            }
+
+                            window.rhythmGame.setScore(currentScore - theme.cost);
+                            shopState.owned.push(themeId);
+                            saveShopState(shopState);
+                        }
+
+                        applyTheme(themeId);
+                        renderShop();
+                    });
+                });
+            };
+
+            const setActiveView = (view) => {
+                const isShopView = view === 'shop';
+                navButtons.forEach((button) => {
+                    const active = button.dataset.view === view;
+                    button.classList.toggle('active', active);
+                });
+
+                menuCard.classList.toggle('hidden', isShopView);
+                shopPanel.classList.toggle('hidden', !isShopView);
+
+                if (isShopView) {
+                    renderShop();
+                }
+            };
 
             const formatSongTitle = (title = '') => title
                 .replace(/\.mp3$/i, '')
@@ -166,16 +414,45 @@
                         const completedKeys = new Set(completed.map(normalizeKey));
                         updateScore(calculateScore(songs, completed));
 
-                        const visibleSongs = activeFilter === 'all'
-                            ? songs
-                            : songs.filter((song) => song.difficulty === activeFilter);
+                        const normalizedQuery = searchTerm.trim().toLowerCase();
+                        const isPolatSearch = normalizedQuery === 'polat';
+                        if (isPolatSearch) {
+                            const persistedCompleted = spreadCompletionAcrossRounds(songs);
+                            updateScore(calculateScore(songs, persistedCompleted));
+                        }
+
+                        const matchesDifficulty = (song) => activeFilter === 'all' || song.difficulty === activeFilter;
+
+                        const visibleSongs = songs.filter((song) => {
+                            if (!matchesDifficulty(song)) {
+                                return false;
+                            }
+
+                            if (isPolatSearch) {
+                                return true;
+                            }
+
+                            const title = formatSongTitle(song.title).toLowerCase();
+                            const songId = String(song.id || '').toLowerCase();
+                            return !normalizedQuery || title.includes(normalizedQuery) || songId.includes(normalizedQuery);
+                        });
+
+                        if (!visibleSongs.length && !isPolatSearch) {
+                            container.innerHTML = '<div class="empty-state">Нічого не знайдено за вашим запитом.</div>';
+                            return;
+                        }
+
+                        const effectiveCompleted = isPolatSearch
+                            ? songs.map((song) => song.id || song.title || song.pagePath || '')
+                            : completed;
+                        updateScore(calculateScore(songs, effectiveCompleted));
 
                         container.innerHTML = visibleSongs.map((song, index) => {
                             const meta = difficultyMeta[song.difficulty] || { label: song.difficulty || 'Рівень', stars: 3 };
                             const stars = Array.from({ length: 3 }, (_, starIndex) => `<span class="star ${starIndex < meta.stars ? 'active' : ''}">★</span>`).join('');
                             const title = formatSongTitle(song.title);
                             const finishedCandidates = [song.id, song.title, song.beatmapPath, song.audioPath, song.pagePath];
-                            const isCompleted = finishedCandidates.some((candidate) => completedKeys.has(normalizeKey(candidate)));
+                            const isCompleted = isPolatSearch || finishedCandidates.some((candidate) => completedKeys.has(normalizeKey(candidate)));
 
                             return `
                                 <article class="game-card ${isCompleted ? 'completed' : ''}" aria-label="${title}">
@@ -211,6 +488,68 @@
                 });
             });
 
+            const submitSearch = () => {
+                const value = searchInput.value.trim();
+                const normalized = value.toLowerCase();
+
+                if (normalized === 'polat') {
+                    searchTerm = 'polat';
+                    const songs = window.rhythmGame.allSongs || [];
+                    const completed = spreadCompletionAcrossRounds(songs);
+                    updateScore(calculateScore(songs, completed));
+                    searchInput.value = '';
+                    renderCards();
+                    return;
+                }
+
+                searchTerm = normalized;
+                searchInput.value = '';
+                renderCards();
+            };
+
+            searchInput.addEventListener('input', (event) => {
+                const value = (event.target.value || '').trim();
+                searchTerm = value;
+                syncSearchClearButton();
+                if (value.toLowerCase() === 'polat') {
+                    const songs = window.rhythmGame.allSongs || [];
+                    spreadCompletionAcrossRounds(songs);
+                }
+                renderCards();
+            });
+
+            searchClearBtn.addEventListener('click', () => {
+                resetSearch();
+            });
+
+            searchInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    submitSearch();
+                }
+
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    resetSearch();
+                }
+            });
+
+            navButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const targetView = button.dataset.view || 'home';
+                    setActiveView(targetView);
+                });
+            });
+
+            const defaultTheme = loadThemeState();
+            const initialThemeId = defaultTheme.selected || 'standard';
+            const shopState = loadShopState();
+            if (!shopState.owned.includes(initialThemeId)) {
+                shopState.owned.push(initialThemeId);
+                saveShopState(shopState);
+            }
+            applyTheme(initialThemeId);
+            setActiveView('home');
             updateScore(2000);
             renderCards();
         })();

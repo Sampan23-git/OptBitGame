@@ -1,0 +1,293 @@
+body[data-theme="standard"] .page-shell,
+body[data-theme="dark-fantasy"] .page-shell {
+    background: linear-gradient(180deg, rgba(18, 9, 32, 0.86), rgba(8, 5, 18, 0.9));
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.42), inset 0 0 30px rgba(62, 38, 95, 0.34);
+}
+
+body[data-theme="dark-fantasy"] .page-shell {
+    background: linear-gradient(180deg, rgba(18, 10, 33, 0.9), rgba(8, 5, 18, 0.96));
+    border-color: rgba(164, 136, 255, 0.18);
+    box-shadow: 0 28px 64px rgba(32, 16, 52, 0.44), inset 0 0 30px rgba(170, 122, 255, 0.12);
+}
+
+body[data-theme="golden-heat"] .page-shell {
+    background: linear-gradient(180deg, rgba(33, 18, 8, 0.9), rgba(16, 10, 6, 0.94));
+    border-color: rgba(255, 207, 102, 0.16);
+    box-shadow: 0 22px 48px rgba(102, 62, 12, 0.28), inset 0 0 24px rgba(255, 204, 90, 0.08);
+}
+
+body[data-theme="sunset-glow"] .page-shell {
+    background: linear-gradient(180deg, rgba(28, 10, 17, 0.9), rgba(15, 7, 11, 0.94));
+    border-color: rgba(255, 168, 110, 0.18);
+    box-shadow: 0 22px 48px rgba(99, 34, 40, 0.22), inset 0 0 24px rgba(255, 150, 100, 0.07);
+}
+
+body[data-theme="ice-pulse"] .page-shell {
+    background: linear-gradient(180deg, rgba(7, 21, 31, 0.9), rgba(6, 12, 17, 0.94));
+    border-color: rgba(125, 219, 255, 0.18);
+    box-shadow: 0 22px 48px rgba(18, 46, 82, 0.22), inset 0 0 24px rgba(115, 211, 255, 0.08);
+}
+
+body[data-theme="red"] .page-shell {
+    background: linear-gradient(180deg, rgba(25, 8, 12, 0.9), rgba(12, 6, 8, 0.95));
+    border-color: rgba(255, 130, 130, 0.18);
+    box-shadow: 0 22px 48px rgba(94, 28, 34, 0.24), inset 0 0 24px rgba(255, 120, 120, 0.08);
+}
+
+body[data-theme="green"] .page-shell {
+    background: linear-gradient(180deg, rgba(8, 24, 16, 0.9), rgba(5, 12, 9, 0.95));
+    border-color: rgba(120, 255, 188, 0.18);
+    box-shadow: 0 22px 48px rgba(22, 74, 52, 0.22), inset 0 0 24px rgba(120, 255, 188, 0.08);
+}
+
+body[data-theme="pink"] .page-shell {
+    background: linear-gradient(180deg, rgba(28, 10, 23, 0.9), rgba(13, 7, 15, 0.95));
+    border-color: rgba(255, 167, 220, 0.18);
+    box-shadow: 0 22px 48px rgba(105, 34, 72, 0.22), inset 0 0 24px rgba(255, 154, 211, 0.08);
+}
+
+body[data-theme="standard"] .game-card,
+body[data-theme="dark-fantasy"] .game-card,
+body[data-theme="standard"] .menu-card,
+body[data-theme="dark-fantasy"] .menu-card,
+body[data-theme="standard"] .shop-panel,
+body[data-theme="dark-fantasy"] .shop-panel,
+body[data-theme="standard"] .difficulty-tab.active,
+body[data-theme="dark-fantasy"] .difficulty-tab.active,
+body[data-theme="standard"] .card-btn,
+body[data-theme="dark-fantasy"] .card-btn,
+body[data-theme="standard"] .score-badge,
+body[data-theme="dark-fantasy"] .score-badge,
+body[data-theme="standard"] .shop-buy-btn,
+body[data-theme="dark-fantasy"] .shop-buy-btn {
+    box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.04), 0 16px 28px rgba(57, 37, 84, 0.2);
+}
+
+body[data-theme="dark-fantasy"] .game-card,
+body[data-theme="dark-fantasy"] .menu-card,
+body[data-theme="dark-fantasy"] .shop-panel,
+body[data-theme="dark-fantasy"] .difficulty-tab.active,
+body[data-theme="dark-fantasy"] .score-badge,
+body[data-theme="dark-fantasy"] .shop-buy-btn {
+    box-shadow: 0 18px 36px rgba(120, 88, 255, 0.18), inset 0 0 18px rgba(194, 167, 255, 0.08);
+}
+
+body[data-theme="dark-fantasy"] .game-card {
+    background: linear-gradient(180deg, rgba(78, 46, 117, 0.84), rgba(30, 16, 44, 0.94));
+    border-color: rgba(189, 166, 255, 0.28);
+}
+
+body[data-theme="dark-fantasy"] .difficulty-tab.active,
+body[data-theme="dark-fantasy"] .card-btn,
+body[data-theme="dark-fantasy"] .shop-buy-btn,
+body[data-theme="dark-fantasy"] .profile-btn {
+    background: linear-gradient(135deg, rgba(138, 110, 255, 0.72), rgba(255, 119, 198, 0.62));
+    box-shadow: 0 0 22px rgba(140, 110, 255, 0.34);
+}
+
+body[data-theme="dark-fantasy"] .card-rank,
+body[data-theme="dark-fantasy"] .card-content h2,
+body[data-theme="dark-fantasy"] .difficulty-line,
+body[data-theme="dark-fantasy"] .title,
+body[data-theme="dark-fantasy"] .score-value,
+body[data-theme="dark-fantasy"] .shop-item-topline h3,
+body[data-theme="dark-fantasy"] .shop-cost,
+body[data-theme="dark-fantasy"] .card-complete-badge {
+    text-shadow: 0 0 18px rgba(166, 140, 255, 0.72);
+}
+
+body[data-theme="golden-heat"] .menu-card,
+body[data-theme="golden-heat"] .shop-panel,
+body[data-theme="golden-heat"] .game-card,
+body[data-theme="golden-heat"] .score-badge,
+body[data-theme="golden-heat"] .difficulty-tab.active,
+body[data-theme="golden-heat"] .card-btn,
+body[data-theme="golden-heat"] .shop-buy-btn {
+    box-shadow: 0 18px 36px rgba(140, 90, 18, 0.16), inset 0 0 16px rgba(255, 213, 92, 0.08);
+}
+
+body[data-theme="golden-heat"] .game-card {
+    background: linear-gradient(180deg, rgba(140, 98, 35, 0.82), rgba(63, 35, 14, 0.92));
+    border-color: rgba(255, 217, 116, 0.24);
+}
+
+body[data-theme="golden-heat"] .card-rank,
+body[data-theme="golden-heat"] .card-content h2,
+body[data-theme="golden-heat"] .difficulty-line,
+body[data-theme="golden-heat"] .title,
+body[data-theme="golden-heat"] .score-value,
+body[data-theme="golden-heat"] .shop-item-topline h3,
+body[data-theme="golden-heat"] .shop-cost,
+body[data-theme="golden-heat"] .card-complete-badge {
+    text-shadow: 0 0 18px rgba(255, 213, 92, 0.6);
+}
+
+body[data-theme="golden-heat"] .difficulty-tab.active,
+body[data-theme="golden-heat"] .card-btn,
+body[data-theme="golden-heat"] .shop-buy-btn {
+    background: linear-gradient(135deg, var(--button-start), var(--button-end));
+}
+
+body[data-theme="sunset-glow"] .menu-card,
+body[data-theme="sunset-glow"] .shop-panel,
+body[data-theme="sunset-glow"] .game-card,
+body[data-theme="sunset-glow"] .difficulty-tab.active,
+body[data-theme="sunset-glow"] .card-btn,
+body[data-theme="sunset-glow"] .shop-buy-btn {
+    box-shadow: 0 18px 36px rgba(255, 122, 66, 0.14), inset 0 0 18px rgba(255, 169, 105, 0.08);
+}
+
+body[data-theme="sunset-glow"] .difficulty-tab.active,
+body[data-theme="sunset-glow"] .card-btn,
+body[data-theme="sunset-glow"] .shop-buy-btn {
+    background: linear-gradient(135deg, var(--button-start), var(--button-end));
+}
+
+body[data-theme="sunset-glow"] .game-card {
+    background: linear-gradient(180deg, rgba(121, 58, 40, 0.82), rgba(42, 17, 17, 0.92));
+    border-color: rgba(255, 175, 120, 0.24);
+}
+
+body[data-theme="ice-pulse"] .menu-card,
+body[data-theme="ice-pulse"] .shop-panel,
+body[data-theme="ice-pulse"] .game-card,
+body[data-theme="ice-pulse"] .difficulty-tab.active,
+body[data-theme="ice-pulse"] .card-btn,
+body[data-theme="ice-pulse"] .shop-buy-btn {
+    box-shadow: 0 18px 36px rgba(47, 156, 255, 0.14), inset 0 0 18px rgba(117, 225, 255, 0.08);
+}
+
+body[data-theme="red"] .game-card,
+body[data-theme="red"] .difficulty-tab.active,
+body[data-theme="red"] .card-btn,
+body[data-theme="red"] .shop-buy-btn {
+    box-shadow: 0 18px 36px rgba(255, 92, 92, 0.14), inset 0 0 18px rgba(255, 170, 170, 0.08);
+}
+
+body[data-theme="green"] .game-card,
+body[data-theme="green"] .difficulty-tab.active,
+body[data-theme="green"] .card-btn,
+body[data-theme="green"] .shop-buy-btn {
+    box-shadow: 0 18px 36px rgba(68, 185, 136, 0.14), inset 0 0 18px rgba(120, 255, 196, 0.08);
+}
+
+body[data-theme="pink"] .game-card,
+body[data-theme="pink"] .difficulty-tab.active,
+body[data-theme="pink"] .card-btn,
+body[data-theme="pink"] .shop-buy-btn {
+    box-shadow: 0 18px 36px rgba(255, 120, 199, 0.14), inset 0 0 18px rgba(255, 200, 232, 0.08);
+}
+
+body[data-theme="ice-pulse"] .difficulty-tab.active,
+body[data-theme="ice-pulse"] .card-btn,
+body[data-theme="ice-pulse"] .shop-buy-btn {
+    background: linear-gradient(135deg, var(--button-start), var(--button-end));
+}
+
+body[data-theme="red"] .difficulty-tab.active,
+body[data-theme="red"] .card-btn,
+body[data-theme="red"] .shop-buy-btn {
+    background: linear-gradient(135deg, var(--button-start), var(--button-end));
+}
+
+body[data-theme="green"] .difficulty-tab.active,
+body[data-theme="green"] .card-btn,
+body[data-theme="green"] .shop-buy-btn {
+    background: linear-gradient(135deg, var(--button-start), var(--button-end));
+}
+
+body[data-theme="pink"] .difficulty-tab.active,
+body[data-theme="pink"] .card-btn,
+body[data-theme="pink"] .shop-buy-btn {
+    background: linear-gradient(135deg, var(--button-start), var(--button-end));
+}
+
+body[data-theme="ice-pulse"] .game-card {
+    background: linear-gradient(180deg, rgba(16, 61, 88, 0.82), rgba(12, 25, 36, 0.92));
+    border-color: rgba(147, 229, 255, 0.24);
+}
+
+body[data-theme="red"] .game-card {
+    background: linear-gradient(180deg, rgba(117, 28, 39, 0.82), rgba(46, 11, 17, 0.92));
+    border-color: rgba(255, 160, 160, 0.24);
+}
+
+body[data-theme="green"] .game-card {
+    background: linear-gradient(180deg, rgba(17, 78, 60, 0.82), rgba(8, 34, 28, 0.92));
+    border-color: rgba(156, 255, 201, 0.24);
+}
+
+body[data-theme="pink"] .game-card {
+    background: linear-gradient(180deg, rgba(119, 43, 96, 0.82), rgba(54, 20, 42, 0.92));
+    border-color: rgba(255, 196, 230, 0.24);
+}
+
+body[data-theme="golden-heat"] .game-card.completed,
+body[data-theme="sunset-glow"] .game-card.completed,
+body[data-theme="ice-pulse"] .game-card.completed,
+body[data-theme="red"] .game-card.completed,
+body[data-theme="green"] .game-card.completed,
+body[data-theme="pink"] .game-card.completed {
+    border-color: rgba(124, 255, 185, 0.72);
+}
+
+body[data-theme="golden-heat"] .card-btn,
+body[data-theme="sunset-glow"] .card-btn,
+body[data-theme="ice-pulse"] .card-btn {
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+body[data-theme="golden-heat"] .nav-btn.active,
+body[data-theme="golden-heat"] .difficulty-tab.active,
+body[data-theme="golden-heat"] .shop-item.selected {
+    border-color: rgba(255, 205, 81, 0.52);
+}
+
+body[data-theme="sunset-glow"] .nav-btn.active,
+body[data-theme="sunset-glow"] .difficulty-tab.active,
+body[data-theme="sunset-glow"] .shop-item.selected {
+    border-color: rgba(255, 145, 90, 0.52);
+}
+
+body[data-theme="ice-pulse"] .nav-btn.active,
+body[data-theme="ice-pulse"] .difficulty-tab.active,
+body[data-theme="ice-pulse"] .shop-item.selected {
+    border-color: rgba(118, 220, 255, 0.52);
+}
+
+body[data-theme="golden-heat"] .search-field,
+body[data-theme="golden-heat"] .score-badge,
+body[data-theme="golden-heat"] .profile-btn,
+body[data-theme="golden-heat"] .menu-card,
+body[data-theme="golden-heat"] .shop-panel {
+    border-color: rgba(255, 203, 87, 0.18);
+}
+
+body[data-theme="sunset-glow"] .search-field,
+body[data-theme="sunset-glow"] .score-badge,
+body[data-theme="sunset-glow"] .profile-btn,
+body[data-theme="sunset-glow"] .menu-card,
+body[data-theme="sunset-glow"] .shop-panel {
+    border-color: rgba(255, 154, 101, 0.18);
+}
+
+body[data-theme="ice-pulse"] .search-field,
+body[data-theme="ice-pulse"] .score-badge,
+body[data-theme="ice-pulse"] .profile-btn,
+body[data-theme="ice-pulse"] .menu-card,
+body[data-theme="ice-pulse"] .shop-panel {
+    border-color: rgba(118, 217, 255, 0.18);
+}
+
+body[data-theme="golden-heat"] .card-btn {
+    border: 1px solid rgba(255, 219, 130, 0.25);
+}
+
+body[data-theme="sunset-glow"] .card-btn {
+    border: 1px solid rgba(255, 173, 122, 0.28);
+}
+
+body[data-theme="ice-pulse"] .card-btn {
+    border: 1px solid rgba(147, 229, 255, 0.28);
+}

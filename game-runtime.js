@@ -25,6 +25,202 @@
     return normalizeId(rawName || 'round');
   })();
 
+  const THEME_STORAGE_KEY = 'rhythm-game-theme-v1';
+  const THEME_VALUES = {
+    standard: {
+      'page-bg-1': '#090014',
+      'page-bg-2': '#12002b',
+      'page-bg-3': '#050014',
+      'page-glow-a': 'rgba(180, 50, 255, 0.35)',
+      'page-glow-b': 'rgba(40, 100, 255, 0.35)',
+      'page-glow-c': 'rgba(255, 40, 180, 0.25)',
+      'panel-bg': 'rgba(10, 5, 25, 0.75)',
+      'panel-border': 'rgba(255, 100, 220, 0.3)',
+      'menu-btn-start': '#5a6bff',
+      'menu-btn-end': '#4b91ff',
+      'title-glow-1': '#ff5dcc',
+      'title-glow-2': '#a84dff',
+      'note-start': '#ff5db8',
+      'note-end': '#a84dff',
+      'note-glow': 'rgba(255, 119, 200, 0.85)',
+      'arrow-start': '#c43b91',
+      'arrow-end': '#7b3bb5',
+      'arrow-hover-start': '#ed55ad',
+      'arrow-hover-end': '#9d4bda',
+      'arrow-active-1': '#ff9ed2',
+      'arrow-active-2': '#c77cff',
+      'lane-panel': 'rgba(255, 255, 255, 0.025)',
+      'lane-ring': 'rgba(255, 100, 220, 0.15)'
+    },
+    'golden-heat': {
+      'page-bg-1': '#1b1206',
+      'page-bg-2': '#2a1d09',
+      'page-bg-3': '#0c0904',
+      'page-glow-a': 'rgba(255, 195, 37, 0.35)',
+      'page-glow-b': 'rgba(255, 150, 0, 0.24)',
+      'page-glow-c': 'rgba(255, 214, 76, 0.2)',
+      'panel-bg': 'rgba(19, 13, 9, 0.78)',
+      'panel-border': 'rgba(255, 205, 104, 0.32)',
+      'menu-btn-start': '#ffbf46',
+      'menu-btn-end': '#ff8f1c',
+      'title-glow-1': '#ffd76a',
+      'title-glow-2': '#ff9f1c',
+      'note-start': '#ffb347',
+      'note-end': '#ff7d1a',
+      'note-glow': 'rgba(255, 188, 72, 0.75)',
+      'arrow-start': '#f2a21d',
+      'arrow-end': '#ca6f12',
+      'arrow-hover-start': '#ffbf61',
+      'arrow-hover-end': '#ff9d2e',
+      'arrow-active-1': '#ffe3a3',
+      'arrow-active-2': '#ffb15f',
+      'lane-panel': 'rgba(255, 212, 96, 0.04)',
+      'lane-ring': 'rgba(255, 192, 92, 0.16)'
+    },
+    'sunset-glow': {
+      'page-bg-1': '#180b12',
+      'page-bg-2': '#2b1220',
+      'page-bg-3': '#09050d',
+      'page-glow-a': 'rgba(255, 138, 76, 0.3)',
+      'page-glow-b': 'rgba(255, 44, 117, 0.18)',
+      'page-glow-c': 'rgba(255, 196, 82, 0.22)',
+      'panel-bg': 'rgba(31, 16, 19, 0.8)',
+      'panel-border': 'rgba(255, 172, 115, 0.32)',
+      'menu-btn-start': '#ff8a5a',
+      'menu-btn-end': '#ff4d79',
+      'title-glow-1': '#ff9a6a',
+      'title-glow-2': '#ff5f9d',
+      'note-start': '#ff8a5a',
+      'note-end': '#ff4d79',
+      'note-glow': 'rgba(255, 154, 95, 0.75)',
+      'arrow-start': '#ff7e5b',
+      'arrow-end': '#cc3a5f',
+      'arrow-hover-start': '#ff9b62',
+      'arrow-hover-end': '#ff5a7d',
+      'arrow-active-1': '#ffd2a2',
+      'arrow-active-2': '#ff9b85',
+      'lane-panel': 'rgba(255, 163, 99, 0.04)',
+      'lane-ring': 'rgba(255, 150, 90, 0.14)'
+    },
+    'ice-pulse': {
+      'page-bg-1': '#04131a',
+      'page-bg-2': '#0e2434',
+      'page-bg-3': '#040b10',
+      'page-glow-a': 'rgba(63, 179, 255, 0.26)',
+      'page-glow-b': 'rgba(36, 111, 255, 0.24)',
+      'page-glow-c': 'rgba(140, 244, 255, 0.22)',
+      'panel-bg': 'rgba(8, 21, 29, 0.78)',
+      'panel-border': 'rgba(131, 217, 255, 0.3)',
+      'menu-btn-start': '#56abff',
+      'menu-btn-end': '#5fe1ff',
+      'title-glow-1': '#7ce7ff',
+      'title-glow-2': '#76aaff',
+      'note-start': '#61d7ff',
+      'note-end': '#6d9bff',
+      'note-glow': 'rgba(98, 213, 255, 0.74)',
+      'arrow-start': '#57b8ff',
+      'arrow-end': '#4569d9',
+      'arrow-hover-start': '#7ae1ff',
+      'arrow-hover-end': '#72b7ff',
+      'arrow-active-1': '#c0f7ff',
+      'arrow-active-2': '#8ecfff',
+      'lane-panel': 'rgba(96, 194, 255, 0.04)',
+      'lane-ring': 'rgba(116, 222, 255, 0.15)'
+    },
+    red: {
+      'page-bg-1': '#2b090f',
+      'page-bg-2': '#4d1017',
+      'page-bg-3': '#1a0508',
+      'page-glow-a': 'rgba(255, 87, 100, 0.22)',
+      'page-glow-b': 'rgba(255, 136, 91, 0.22)',
+      'page-glow-c': 'rgba(255, 204, 127, 0.16)',
+      'panel-bg': 'rgba(34, 12, 15, 0.8)',
+      'panel-border': 'rgba(255, 143, 147, 0.3)',
+      'menu-btn-start': '#ff5f5f',
+      'menu-btn-end': '#ff8a5a',
+      'title-glow-1': '#ff9aa5',
+      'title-glow-2': '#ff6e59',
+      'note-start': '#ff6d7a',
+      'note-end': '#ff915e',
+      'note-glow': 'rgba(255, 116, 115, 0.82)',
+      'arrow-start': '#ff6d6d',
+      'arrow-end': '#cc3d4c',
+      'arrow-hover-start': '#ff8d76',
+      'arrow-hover-end': '#ff5a4d',
+      'arrow-active-1': '#ffc0a2',
+      'arrow-active-2': '#ff7686',
+      'lane-panel': 'rgba(255, 121, 95, 0.05)',
+      'lane-ring': 'rgba(255, 121, 95, 0.15)'
+    },
+    green: {
+      'page-bg-1': '#071c17',
+      'page-bg-2': '#133d2c',
+      'page-bg-3': '#06140f',
+      'page-glow-a': 'rgba(80, 205, 143, 0.2)',
+      'page-glow-b': 'rgba(86, 178, 180, 0.18)',
+      'page-glow-c': 'rgba(152, 255, 202, 0.18)',
+      'panel-bg': 'rgba(7, 24, 19, 0.76)',
+      'panel-border': 'rgba(120, 255, 202, 0.28)',
+      'menu-btn-start': '#4ecb8a',
+      'menu-btn-end': '#50b2a2',
+      'title-glow-1': '#8cf7be',
+      'title-glow-2': '#59c8a3',
+      'note-start': '#5ddf9f',
+      'note-end': '#41a5a3',
+      'note-glow': 'rgba(95, 222, 162, 0.82)',
+      'arrow-start': '#53d990',
+      'arrow-end': '#2d7f71',
+      'arrow-hover-start': '#93f3bf',
+      'arrow-hover-end': '#53bda7',
+      'arrow-active-1': '#d0ffe7',
+      'arrow-active-2': '#74d7b2',
+      'lane-panel': 'rgba(102, 224, 165, 0.05)',
+      'lane-ring': 'rgba(102, 224, 165, 0.15)'
+    },
+    pink: {
+      'page-bg-1': '#2f0c24',
+      'page-bg-2': '#4a123a',
+      'page-bg-3': '#170914',
+      'page-glow-a': 'rgba(255, 110, 188, 0.2)',
+      'page-glow-b': 'rgba(255, 162, 233, 0.18)',
+      'page-glow-c': 'rgba(255, 201, 238, 0.15)',
+      'panel-bg': 'rgba(37, 15, 31, 0.8)',
+      'panel-border': 'rgba(255, 181, 224, 0.28)',
+      'menu-btn-start': '#ff77c6',
+      'menu-btn-end': '#ffb8d9',
+      'title-glow-1': '#ffc1e2',
+      'title-glow-2': '#ff7dc4',
+      'note-start': '#ff8fd0',
+      'note-end': '#ffb8d9',
+      'note-glow': 'rgba(255, 146, 216, 0.8)',
+      'arrow-start': '#ff7ec9',
+      'arrow-end': '#c84f9d',
+      'arrow-hover-start': '#ffb4e2',
+      'arrow-hover-end': '#ff73b9',
+      'arrow-active-1': '#ffe1f2',
+      'arrow-active-2': '#ff9ed0',
+      'lane-panel': 'rgba(255, 146, 216, 0.05)',
+      'lane-ring': 'rgba(255, 146, 216, 0.14)'
+    }
+  };
+
+  function applyGameTheme() {
+    try {
+      const raw = localStorage.getItem(THEME_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : { selected: 'standard' };
+      const selected = THEME_VALUES[parsed.selected] ? parsed.selected : 'standard';
+      document.body.dataset.theme = selected;
+      const theme = THEME_VALUES[selected] || THEME_VALUES.standard;
+      Object.entries(theme).forEach(([key, value]) => {
+        document.documentElement.style.setProperty(`--${key}`, value);
+      });
+    } catch (error) {
+      document.body.dataset.theme = 'standard';
+    }
+  }
+
+  applyGameTheme();
+
   // --- Tunable difficulty/feel constants -----------------------------------
   const baseFallSpeed = Number(config.baseFallSpeed) || 430; // px/sec baseline
   const hitWindowSec = 0.14;   // +/- how forgiving a hit is, in seconds of real audio time
